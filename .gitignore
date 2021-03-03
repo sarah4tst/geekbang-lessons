@@ -46,3 +46,4 @@ compiler/.gradle/*
 
 # Tomcat
 .extract
+/db/

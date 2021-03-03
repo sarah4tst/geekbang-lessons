@@ -1,11 +1,12 @@
 package org.geektimes.projects.user.sql;
 
+import java.io.IOException;
+import java.io.InputStream;
 import org.geektimes.projects.user.domain.User;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.HashMap;
@@ -20,8 +21,17 @@ public class DBConnectionManager {
         this.connection = connection;
     }
 
+    private static Properties jdbcProperties = new Properties();
+
+
     public Connection getConnection() {
-        return this.connection;
+        try {
+            this.connection = DriverManager.getConnection(jdbcProperties.getProperty("url"),jdbcProperties);
+            return this.connection;
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return null;
     }
 
     public void releaseConnection() {
@@ -51,6 +61,14 @@ public class DBConnectionManager {
             "('D','******','d@gmail.com','4') , " +
             "('E','******','e@gmail.com','5')";
 
+    static {
+        try (InputStream is = DBConnectionManager.class.getClassLoader().getResourceAsStream(
+            "jdbc.properties"))  {
+            jdbcProperties.load(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) throws Exception {
 //        通过 ClassLoader 加载 java.sql.DriverManager -> static 模块 {}
@@ -60,12 +78,12 @@ public class DBConnectionManager {
 //        Driver driver = DriverManager.getDriver("jdbc:derby:/db/user-platform;create=true");
 //        Connection connection = driver.connect("jdbc:derby:/db/user-platform;create=true", new Properties());
 
-        String databaseURL = "jdbc:derby:/db/user-platform;create=true";
-        Connection connection = DriverManager.getConnection(databaseURL);
+        String databaseURL = "jdbc:derby:db/UserPlatformDB;create=true";
+        Connection connection = DriverManager.getConnection(jdbcProperties.getProperty("url"),jdbcProperties);
 
         Statement statement = connection.createStatement();
         // 删除 users 表
-        System.out.println(statement.execute(DROP_USERS_TABLE_DDL_SQL)); // false
+//        System.out.println(statement.execute(DROP_USERS_TABLE_DDL_SQL)); // false
         // 创建 users 表
         System.out.println(statement.execute(CREATE_USERS_TABLE_DDL_SQL)); // false
         System.out.println(statement.executeUpdate(INSERT_USER_DML_SQL));  // 5

@@ -1,5 +1,7 @@
 package org.geektimes.projects.user.repository;
 
+import java.beans.IntrospectionException;
+import java.lang.reflect.InvocationTargetException;
 import org.geektimes.function.ThrowableFunction;
 import org.geektimes.projects.user.domain.User;
 import org.geektimes.projects.user.sql.DBConnectionManager;
@@ -43,10 +45,11 @@ public class DatabaseUserRepository implements UserRepository {
 
     @Override
     public boolean save(User user) {
-        return false;
+      int res = executeUpdate(INSERT_USER_DML_SQL, COMMON_EXCEPTION_HANDLER, user.getName(), user.getPassword(), user.getEmail(), user.getPhoneNumber());
+      return res==1;
     }
 
-    @Override
+  @Override
     public boolean deleteById(Long userId) {
         return false;
     }
@@ -63,43 +66,77 @@ public class DatabaseUserRepository implements UserRepository {
 
     @Override
     public User getByNameAndPassword(String userName, String password) {
-        return executeQuery("SELECT id,name,password,email,phoneNumber FROM users WHERE name=? and password=?",
-                resultSet -> {
-                    // TODO
-                    return new User();
-                }, COMMON_EXCEPTION_HANDLER, userName, password);
+    return executeQuery(
+        "SELECT id,name,password,email,phoneNumber FROM users WHERE name=? and password=?",
+        resultSet -> {
+          if (resultSet.next()) {
+            User user = new User();
+            BeanInfo beanInfo = Introspector.getBeanInfo(User.class, Object.class);
+            resultRowToBean(resultSet, user, beanInfo);
+            return user;
+          }
+          return null;
+        },
+        COMMON_EXCEPTION_HANDLER,
+        userName,
+        password);
     }
 
-    @Override
-    public Collection<User> getAll() {
-        return executeQuery("SELECT id,name,password,email,phoneNumber FROM users", resultSet -> {
-            // BeanInfo -> IntrospectionException
-            BeanInfo userBeanInfo = Introspector.getBeanInfo(User.class, Object.class);
-            List<User> users = new ArrayList<>();
-            while (resultSet.next()) { // 如果存在并且游标滚动 // SQLException
-                User user = new User();
-                for (PropertyDescriptor propertyDescriptor : userBeanInfo.getPropertyDescriptors()) {
-                    String fieldName = propertyDescriptor.getName();
-                    Class fieldType = propertyDescriptor.getPropertyType();
-                    String methodName = resultSetMethodMappings.get(fieldType);
-                    // 可能存在映射关系（不过此处是相等的）
-                    String columnLabel = mapColumnLabel(fieldName);
-                    Method resultSetMethod = ResultSet.class.getMethod(methodName, String.class);
-                    // 通过放射调用 getXXX(String) 方法
-                    Object resultValue = resultSetMethod.invoke(resultSet, columnLabel);
-                    // 获取 User 类 Setter方法
-                    // PropertyDescriptor ReadMethod 等于 Getter 方法
-                    // PropertyDescriptor WriteMethod 等于 Setter 方法
-                    Method setterMethodFromUser = propertyDescriptor.getWriteMethod();
-                    // 以 id 为例，  user.setId(resultSet.getLong("id"));
-                    setterMethodFromUser.invoke(user, resultValue);
-                }
-            }
-            return users;
-        }, e -> {
-            // 异常处理
-        });
+  private <T> void resultRowToBean(ResultSet resultSet, T t, BeanInfo beanInfo)
+      throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors()) {
+      String fieldName = propertyDescriptor.getName();
+      Class fieldType = propertyDescriptor.getPropertyType();
+      String methodName = resultSetMethodMappings.get(fieldType);
+      // 可能存在映射关系（不过此处是相等的）
+      String columnLabel = mapColumnLabel(fieldName);
+      Method resultSetMethod = ResultSet.class.getMethod(methodName, String.class);
+      // 通过放射调用 getXXX(String) 方法
+      Object resultValue = resultSetMethod.invoke(resultSet, columnLabel);
+      // 获取 User 类 Setter方法
+      // PropertyDescriptor ReadMethod 等于 Getter 方法
+      // PropertyDescriptor WriteMethod 等于 Setter 方法
+      Method setterMethodFromUser = propertyDescriptor.getWriteMethod();
+      // 以 id 为例，  user.setId(resultSet.getLong("id"));
+      setterMethodFromUser.invoke(t, resultValue);
+      System.out.println(columnLabel + fieldName + methodName);
+      System.out.println(t);
     }
+  }
+
+  @Override
+    public Collection<User> getAll() {
+    return executeQuery(
+        QUERY_ALL_USERS_DML_SQL,
+        resultSet -> {
+          BeanInfo userBeanInfo = Introspector.getBeanInfo(User.class, Object.class);
+          List<User> res = new ArrayList<>();
+          while (resultSet.next()) { // 如果存在并且游标滚动 // SQLException
+            User user = new User();
+            resultRowToBean(resultSet, user, userBeanInfo);
+            res.add(user);
+          }
+          return res;
+        },
+        COMMON_EXCEPTION_HANDLER);
+    }
+
+  @Override
+  public User getByName(String userName) {
+    return executeQuery(
+        "SELECT id,name,password,email,phoneNumber FROM users WHERE name=?",
+        resultSet -> {
+          if (resultSet.next()) {
+            User user = new User();
+            BeanInfo beanInfo = Introspector.getBeanInfo(User.class, Object.class);
+            resultRowToBean(resultSet, user, beanInfo);
+            return user;
+          }
+          return null;
+        },
+        COMMON_EXCEPTION_HANDLER,
+        userName);
+  }
 
     /**
      * @param sql
@@ -111,23 +148,8 @@ public class DatabaseUserRepository implements UserRepository {
                                  Consumer<Throwable> exceptionHandler, Object... args) {
         Connection connection = getConnection();
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            for (int i = 0; i < args.length; i++) {
-                Object arg = args[i];
-                Class argType = arg.getClass();
-
-                Class wrapperType = wrapperToPrimitive(argType);
-
-                if (wrapperType == null) {
-                    wrapperType = argType;
-                }
-
-                // Boolean -> boolean
-                String methodName = preparedStatementMethodMappings.get(argType);
-                Method method = PreparedStatement.class.getMethod(methodName, wrapperType);
-                method.invoke(preparedStatement, i + 1, args);
-            }
-            ResultSet resultSet = preparedStatement.executeQuery();
+          PreparedStatement preparedStatement = getPreparedStatement(connection, sql,  args);
+          ResultSet resultSet = preparedStatement.executeQuery();
             // 返回一个 POJO List -> ResultSet -> POJO List
             // ResultSet -> T
             return function.apply(resultSet);
@@ -137,6 +159,37 @@ public class DatabaseUserRepository implements UserRepository {
         return null;
     }
 
+  private PreparedStatement getPreparedStatement(Connection connection, String sql,  Object[] args)
+      throws SQLException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    PreparedStatement preparedStatement = connection.prepareStatement(sql);
+    for (int i = 0; i < args.length; i++) {
+      Object arg = args[i];
+      Class argType = arg.getClass();
+
+      Class wrapperType = wrapperToPrimitive(argType);
+
+      if (wrapperType == null) {
+        wrapperType = argType;
+      }
+
+      // Boolean -> boolean
+      String methodName = preparedStatementMethodMappings.get(argType);
+      Method method = PreparedStatement.class.getMethod(methodName, int.class, wrapperType);
+      method.invoke(preparedStatement, i + 1, arg);
+    }
+    return preparedStatement;
+  }
+
+  protected int executeUpdate(String sql, Consumer<Throwable> exceptionHandler, Object... args ) {
+    Connection connection = getConnection();
+    try {
+      PreparedStatement preparedStatement = getPreparedStatement(connection, sql, args);
+      return preparedStatement.executeUpdate();
+    } catch (Throwable e) {
+      exceptionHandler.accept(e);
+    }
+    return -1;
+  }
 
     private static String mapColumnLabel(String fieldName) {
         return fieldName;
