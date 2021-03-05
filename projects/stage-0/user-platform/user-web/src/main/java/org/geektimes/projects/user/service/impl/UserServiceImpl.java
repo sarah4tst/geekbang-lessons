@@ -15,7 +15,7 @@ public class UserServiceImpl implements UserService {
   }
 
   public UserServiceImpl() {
-    userRepository = new DatabaseUserRepository(new DBConnectionManager());
+    userRepository = new DatabaseUserRepository();
   }
 
   @Override
