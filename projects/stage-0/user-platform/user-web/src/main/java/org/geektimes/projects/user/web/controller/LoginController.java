@@ -7,6 +7,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import org.apache.commons.lang.StringUtils;
+import org.geektimes.context.ComponentContext;
 import org.geektimes.projects.user.service.UserService;
 import org.geektimes.projects.user.service.UserServiceImpl;
 import org.geektimes.web.mvc.controller.PageController;
@@ -17,7 +18,7 @@ import org.geektimes.web.mvc.controller.PageController;
 @Path("/login")
 public class LoginController implements PageController {
 
-    UserService userService = new UserServiceImpl();
+    private UserService userService = ComponentContext.getInstance().getComponent("bean/UserService");
 
     @GET
     @POST

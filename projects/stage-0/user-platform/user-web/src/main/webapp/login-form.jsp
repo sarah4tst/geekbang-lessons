@@ -24,7 +24,7 @@
     <form class="form-signin" action="/login" method="post">
       <h1 class="h3 mb-3 font-weight-normal">登录</h1>
       <input name="name" id="inputName" class="form-control" placeholder="请输入用户名" required autofocus />
-      <input type="password" name="password" id="inputPassword" class="form-control" placeholder="请输入密码" required />
+      <input type="password" name="password" id="inputPassword" class="form-control" value="123456" placeholder="请输入密码" required />
       <div class="checkbox mb-3">
         <label> <input type="checkbox" value="remember-me">
           Remember me

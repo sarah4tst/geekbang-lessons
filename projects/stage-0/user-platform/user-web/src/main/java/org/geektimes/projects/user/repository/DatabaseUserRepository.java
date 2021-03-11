@@ -3,7 +3,7 @@ package org.geektimes.projects.user.repository;
 import java.beans.IntrospectionException;
 import java.lang.reflect.InvocationTargetException;
 import org.geektimes.function.ThrowableFunction;
-import org.geektimes.projects.user.context.ComponentContext;
+import org.geektimes.context.ComponentContext;
 import org.geektimes.projects.user.domain.User;
 import org.geektimes.projects.user.sql.DBConnectionManager;
 

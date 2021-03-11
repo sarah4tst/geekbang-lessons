@@ -7,9 +7,10 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import org.apache.commons.lang.StringUtils;
+import org.geektimes.context.ComponentContext;
 import org.geektimes.projects.user.domain.User;
 import org.geektimes.projects.user.service.UserService;
-import org.geektimes.projects.user.service.UserServiceImpl;
+import javax.validation.ValidationException;
 import org.geektimes.web.mvc.controller.PageController;
 
 /**
@@ -17,8 +18,7 @@ import org.geektimes.web.mvc.controller.PageController;
  */
 @Path("/register")
 public class RegisterController implements PageController {
-
-    UserService userService = new UserServiceImpl();
+    private UserService userService = ComponentContext.getInstance().getComponent("bean/UserService");
 
     @GET
     @POST
@@ -47,11 +47,17 @@ public class RegisterController implements PageController {
         user.setEmail(email);
         user.setPhoneNumber(phoneNumber);
 
-        if (userService.register(user)) {
-            request.setAttribute("Login_Name", name);
-        } else {
-            request.setAttribute("Error_Message","Register Failed, username has been taken");
+        try {
+            if (userService.register(user)) {
+                request.setAttribute("Login_Name", name);
+            } else {
+                request.setAttribute("Error_Message","Register Failed, username has been taken");
+            }
+        } catch (ValidationException e) {
+            request.setAttribute("Error_Message",e.getMessage());
         }
+
+
         return "index.jsp";
     }
 }

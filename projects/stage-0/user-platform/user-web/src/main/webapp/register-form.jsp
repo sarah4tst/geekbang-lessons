@@ -25,8 +25,8 @@
       <h1 class="h3 mb-3 font-weight-normal">注册</h1>
       <input id="name" name="name" class="form-control" placeholder="用户名" required autofocus />
       <input id="inputEmail" name="email" class="form-control" placeholder="请输入电子邮件" />
-      <input type="password" id="inputPassword" name="password" class="form-control" placeholder="请输入密码" required />
-      <input type="tel" id="phoneNumber" name="phoneNumber"  class="form-control" placeholder="电话号码" />
+      <input type="password" id="inputPassword" name="password" class="form-control" value="123456" placeholder="请输入密码"  required />
+      <input type="tel" id="phoneNumber" name="phoneNumber"  class="form-control" value="12345678901" placeholder="电话号码" />
       <button class="btn btn-lg btn-primary btn-block" type="submit">Sign
         Up</button>
     </form>
