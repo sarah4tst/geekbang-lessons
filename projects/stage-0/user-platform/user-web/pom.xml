@@ -92,6 +92,12 @@
             <artifactId>microprofile-config-api</artifactId>
         </dependency>
 
+        <!-- jolokia -->
+        <dependency>
+            <groupId>org.jolokia</groupId>
+            <artifactId>jolokia-core</artifactId>
+        </dependency>
+
 
     </dependencies>
 

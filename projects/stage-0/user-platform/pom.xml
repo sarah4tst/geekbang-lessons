@@ -43,6 +43,9 @@
         <maven.flatten.version>1.2.5</maven.flatten.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+
+        <!-- JMX -->
+        <jolokia.version>1.6.2</jolokia.version>
     </properties>
 
     <!-- Artifacts 依赖版本管理 -->
@@ -122,6 +125,12 @@
                 <version>${microprofile-config-api.version}</version>
             </dependency>
 
+            <!-- jolokia -->
+            <dependency>
+                <groupId>org.jolokia</groupId>
+                <artifactId>jolokia-core</artifactId>
+                <version>${jolokia.version}</version>
+            </dependency>
         </dependencies>
 
     </dependencyManagement>
