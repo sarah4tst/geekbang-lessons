@@ -5,6 +5,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import org.geektimes.projects.user.web.controller.LoginController;
 import org.geektimes.projects.user.web.controller.RegisterController;
 
 public class JMXContextInitializerListener implements ServletContextListener {
@@ -23,6 +24,7 @@ public class JMXContextInitializerListener implements ServletContextListener {
     MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
     // Register MBean
     mBeanServer.registerMBean(new RegisterController(), new ObjectName("SERVLET:name=RegisterController"));
+    mBeanServer.registerMBean(new LoginController(), new ObjectName("SERVLET:name=LoginController"));
   }
 
   @Override
