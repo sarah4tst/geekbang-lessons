@@ -58,21 +58,20 @@ public class LoginController extends ContextMXBean implements PageController {
     }
 
     @Override
-    protected void createMBeanInfo() {
-        this.dMBeanInfo = new MBeanInfo(
+    protected MBeanInfo createMBeanInfo() {
+        return new MBeanInfo(
             this.getClass().getName(),
             "Login MBean Allow set response header name nad value",
-            mBeanAttributeInfos,
+            new MBeanAttributeInfo[]{new MBeanAttributeInfo("version", "java.lang.String",
+                "version",
+                true, true, false)},
             null, null,null);
     }
 
     @Override
-    protected void createMBeanAttributeInfos() {
-        MBeanAttributeInfo ATTR_INFO_HEADER = new MBeanAttributeInfo("version", "java.lang.String",
-            "version",
-            true, true, false);
-        mBeanAttributeInfos = new MBeanAttributeInfo[] {
-            ATTR_INFO_HEADER
-        };
+    public String toString() {
+        return "LoginController{" +
+            "version='" + version + '\'' +
+            '}';
     }
 }

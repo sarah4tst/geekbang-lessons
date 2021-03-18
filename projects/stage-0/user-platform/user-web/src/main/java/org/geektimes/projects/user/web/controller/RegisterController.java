@@ -102,16 +102,12 @@ public class RegisterController extends ContextMXBean implements PageController 
   }
 
   @Override
-  protected void createMBeanInfo() {
-    this.dMBeanInfo = new MBeanInfo(
+  protected MBeanInfo createMBeanInfo() {
+    return new MBeanInfo(
         RegisterController.class.getName(),
         "Register MBean Allow set response header name nad value",
-        mBeanAttributeInfos,
+        new MBeanAttributeInfo[]{ATTR_INFO_HEADER,ATTRIBUTE_INFO_VAL},
         null, null,null);
   }
 
-  @Override
-  protected void createMBeanAttributeInfos() {
-    this.mBeanAttributeInfos = new MBeanAttributeInfo[]{ATTR_INFO_HEADER,ATTRIBUTE_INFO_VAL};
-  }
 }
