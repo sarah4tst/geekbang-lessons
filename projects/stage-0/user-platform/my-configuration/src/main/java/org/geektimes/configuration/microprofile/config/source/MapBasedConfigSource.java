@@ -33,13 +33,14 @@ public abstract class MapBasedConfigSource implements ConfigSource {
         try {
             prepareConfigData(configData);
         } catch (Throwable cause) {
-            throw new IllegalStateException("准备配置数据发生错误",cause);
+            throw new IllegalStateException("准备配置数据发生错误", cause);
         }
         return Collections.unmodifiableMap(configData);
     }
 
     /**
      * 准备配置数据
+     *
      * @param configData
      * @throws Throwable
      */
