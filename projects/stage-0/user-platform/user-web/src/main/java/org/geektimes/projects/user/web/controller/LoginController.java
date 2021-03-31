@@ -9,6 +9,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import org.apache.commons.lang.StringUtils;
+import org.geektimes.context.ClassicComponentContext;
 import org.geektimes.context.ComponentContext;
 import org.geektimes.projects.user.management.ContextMXBean;
 import org.geektimes.projects.user.service.UserService;
@@ -20,7 +21,7 @@ import org.geektimes.web.mvc.controller.PageController;
 @Path("/login")
 public class LoginController extends ContextMXBean implements PageController {
 
-    private UserService userService = ComponentContext.getInstance().getComponent("bean/UserService");
+    private UserService userService = ClassicComponentContext.getInstance().getComponent("bean/UserService");
 
     private String version = "1.0";
 

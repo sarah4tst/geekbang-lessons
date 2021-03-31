@@ -9,7 +9,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import org.apache.commons.lang.StringUtils;
-import org.geektimes.context.ComponentContext;
+import org.geektimes.context.ClassicComponentContext;
 import org.geektimes.projects.user.domain.User;
 import org.geektimes.projects.user.management.ContextMXBean;
 import org.geektimes.projects.user.service.UserService;
@@ -19,7 +19,7 @@ import org.geektimes.web.mvc.controller.PageController;
 /** 输出 “Hello,World” Controller */
 @Path("/register")
 public class RegisterController extends ContextMXBean implements PageController {
-  private UserService userService = ComponentContext.getInstance().getComponent("bean/UserService");
+  private UserService userService = ClassicComponentContext.getInstance().getComponent("bean/UserService");
 
   private static final String DEFAULT_RESP_HEADER_NAME = "X-CUSTOM-TAG";
   private static final String DEFAULT_RESP_HEADER_VAL = "1.0";
