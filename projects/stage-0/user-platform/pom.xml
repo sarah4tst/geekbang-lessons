@@ -45,14 +45,9 @@
         <derby.version>10.1.3.1</derby.version>
         <hibernate.version>5.4.29.Final</hibernate.version>
         <hibernate.validator.version>5.4.3.Final</hibernate.validator.version>
-<<<<<<< HEAD
-
-
-=======
         <glassfish-el.version>3.0.1-b08</glassfish-el.version>
         <jackson.version>2.9.5</jackson.version>
         <activemq.version>5.9.1</activemq.version>
->>>>>>> upstream/master
 
         <!-- Testing 版本 -->
         <junit.version>4.13</junit.version>
@@ -202,7 +197,6 @@
                 <version>${glassfish-el.version}</version>
             </dependency>
 
-<<<<<<< HEAD
             <!-- jolokia -->
             <dependency>
                 <groupId>org.jolokia</groupId>
@@ -210,9 +204,7 @@
                 <version>${jolokia.version}</version>
             </dependency>
 
-=======
             <!-- Jackson -->
->>>>>>> upstream/master
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
@@ -332,9 +324,6 @@
         </plugins>
     </build>
 
-<<<<<<< HEAD
-</project>
-=======
     <profiles>
         <profile>
             <id>tomcat-7</id>
@@ -389,4 +378,3 @@
     </profiles>
 
 </project>
->>>>>>> upstream/master
